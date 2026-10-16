@@ -1,0 +1,4 @@
+<resources>
+    <!-- Compose draws the whole UI; this theme only sets the window behind it. -->
+    <style name="Theme.FocusTimer" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>
