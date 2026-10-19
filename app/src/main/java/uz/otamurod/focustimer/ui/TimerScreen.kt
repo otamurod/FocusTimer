@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,10 +27,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import uz.otamurod.focustimer.R
 import uz.otamurod.focustimer.timer.TimerUiState
 import uz.otamurod.focustimer.timer.formatTime
 import uz.otamurod.focustimer.ui.theme.FocusTimerTheme
@@ -70,12 +74,13 @@ fun TimerContent(
             modifier = Modifier
                 .fillMaxSize()
                 .safeDrawingPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "Focus",
+                text = stringResource(R.string.title_focus),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
@@ -97,12 +102,20 @@ fun TimerContent(
             Spacer(Modifier.height(40.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = if (state.isRunning) onPause else onStart) {
-                    Text(if (state.isRunning) "Pause" else "Start")
+                val buttonTextId = if (state.isRunning) {
+                    R.string.action_pause
+                } else {
+                    R.string.action_start
                 }
+
+                Button(onClick = if (state.isRunning) onPause else onStart) {
+                    Text(stringResource(buttonTextId))
+                }
+
                 Spacer(Modifier.width(16.dp))
+
                 OutlinedButton(onClick = onReset) {
-                    Text("Reset")
+                    Text(stringResource(R.string.action_reset))
                 }
             }
         }

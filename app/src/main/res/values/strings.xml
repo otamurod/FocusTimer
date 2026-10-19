@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Focus Timer</string>
+    <string name="title_focus">Focus</string>
+    <string name="action_start">Start</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_reset">Reset</string>
 </resources>

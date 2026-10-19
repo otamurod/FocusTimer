@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Fokus taymer</string>
+    <string name="title_focus">Fokus</string>
+    <string name="action_start">Boshlash</string>
+    <string name="action_pause">Pauza</string>
+    <string name="action_reset">Qayta boshlash</string>
+</resources>

@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.focustimer"
+    namespace = "uz.otamurod.focustimer"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.focustimer"
+        applicationId = "uz.otamurod.focustimer"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -18,6 +18,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Debug and release builds can be installed side by side on one device.
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
         release {
             isMinifyEnabled = false
         }
