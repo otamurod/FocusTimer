@@ -9,4 +9,11 @@ data class Settings(
     val shortBreakMin: Int = 5,
     val longBreakMin: Int = 15,
     val sessionsBeforeLong: Int = 4,
-)
+) {
+    /** Length of a session of the given mode, in minutes. */
+    fun minutesFor(mode: SessionMode): Int = when (mode) {
+        SessionMode.Focus -> focusMin
+        SessionMode.ShortBreak -> shortBreakMin
+        SessionMode.LongBreak -> longBreakMin
+    }
+}

@@ -1,20 +1,22 @@
 package uz.otamurod.focustimer.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import uz.otamurod.focustimer.R
+import uz.otamurod.focustimer.model.SessionMode
 import uz.otamurod.focustimer.timer.TimerUiState
 import uz.otamurod.focustimer.timer.formatTime
 import uz.otamurod.focustimer.ui.theme.FocusTimerTheme
@@ -50,13 +53,15 @@ fun TimerScreen(
         onStart = viewModel::start,
         onPause = viewModel::pause,
         onReset = viewModel::reset,
+        onSelectMode = viewModel::selectMode,
         modifier = modifier,
     )
 }
 
 /**
  * Stateless UI: it only draws the state it is given and reports events upward
- * through lambdas (Article 1, section 3). That makes it easy to preview and test.
+ * through lambdas (Article 1, section 3; Article 3, section 5).
+ * That makes it easy to preview and test.
  */
 @Composable
 fun TimerContent(
@@ -64,6 +69,7 @@ fun TimerContent(
     onStart: () -> Unit,
     onPause: () -> Unit,
     onReset: () -> Unit,
+    onSelectMode: (SessionMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -79,45 +85,93 @@ fun TimerContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
+            ModeChips(selected = state.mode, onSelect = onSelectMode)
+
+            Spacer(Modifier.height(24.dp))
+
             Text(
-                text = stringResource(R.string.title_focus),
+                text = stringResource(state.mode.titleRes()),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(24.dp))
 
-            Box(contentAlignment = Alignment.Center) {
-                TimerRing(
-                    progress = state.progress,
-                    modifier = Modifier.size(280.dp),
-                )
-                Text(
-                    text = formatTime(state.remainingSeconds),
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-            }
+            TimerDisplay(state = state)
 
             Spacer(Modifier.height(40.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                val buttonTextId = if (state.isRunning) {
-                    R.string.action_pause
-                } else {
-                    R.string.action_start
-                }
+            TimerControls(
+                isRunning = state.isRunning,
+                onStart = onStart,
+                onPause = onPause,
+                onReset = onReset,
+            )
+        }
+    }
+}
 
-                Button(onClick = if (state.isRunning) onPause else onStart) {
-                    Text(stringResource(buttonTextId))
-                }
+/** One chip per [SessionMode]. The selected mode is passed in; taps are reported upward. */
+@Composable
+fun ModeChips(
+    selected: SessionMode,
+    onSelect: (SessionMode) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        SessionMode.entries.forEach { mode ->
+            FilterChip(
+                selected = mode == selected,
+                onClick = { onSelect(mode) },
+                label = {
+                    Text(stringResource(mode.chipRes()))
+                },
+            )
+        }
+    }
+}
 
-                Spacer(Modifier.width(16.dp))
+/** The ring with the remaining time in the middle. */
+@Composable
+fun TimerDisplay(
+    state: TimerUiState,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
+        TimerRing(
+            progress = state.progress,
+            modifier = Modifier.size(280.dp),
+        )
 
-                OutlinedButton(onClick = onReset) {
-                    Text(stringResource(R.string.action_reset))
-                }
-            }
+        Text(
+            text = formatTime(state.remainingSeconds),
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.onBackground,
+        )
+    }
+}
+
+/** Start/Pause and Reset buttons. */
+@Composable
+fun TimerControls(
+    isRunning: Boolean,
+    onStart: () -> Unit,
+    onPause: () -> Unit,
+    onReset: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        Button(onClick = if (isRunning) onPause else onStart) {
+            Text(stringResource(if (isRunning) R.string.action_pause else R.string.action_start))
+        }
+
+        Spacer(Modifier.width(16.dp))
+
+        OutlinedButton(onClick = onReset) {
+            Text(stringResource(R.string.action_reset))
         }
     }
 }
@@ -161,6 +215,19 @@ fun TimerRing(
     }
 }
 
+// Mapping a mode to its text keeps Android resource IDs out of the model package.
+private fun SessionMode.titleRes(): Int = when (this) {
+    SessionMode.Focus -> R.string.title_focus
+    SessionMode.ShortBreak -> R.string.title_short_break
+    SessionMode.LongBreak -> R.string.title_long_break
+}
+
+private fun SessionMode.chipRes(): Int = when (this) {
+    SessionMode.Focus -> R.string.chip_focus
+    SessionMode.ShortBreak -> R.string.chip_short
+    SessionMode.LongBreak -> R.string.chip_long
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun TimerContentPreview() {
@@ -174,6 +241,42 @@ private fun TimerContentPreview() {
             onStart = {},
             onPause = {},
             onReset = {},
+            onSelectMode = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun BreakModePreview() {
+    FocusTimerTheme {
+        TimerContent(
+            state = TimerUiState(
+                totalSeconds = 300,
+                mode = SessionMode.ShortBreak
+            ),
+            onStart = {},
+            onPause = {},
+            onReset = {},
+            onSelectMode = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DarkModePreview() {
+    FocusTimerTheme {
+        TimerContent(
+            state = TimerUiState(
+                totalSeconds = 1500,
+                remainingSeconds = 600,
+                mode = SessionMode.Focus
+            ),
+            onStart = {},
+            onPause = {},
+            onReset = {},
+            onSelectMode = {},
         )
     }
 }

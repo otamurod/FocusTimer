@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">Focus Timer</string>
+
+    <!-- Screen title for each session mode -->
     <string name="title_focus">Focus</string>
+    <string name="title_short_break">Short break</string>
+    <string name="title_long_break">Long break</string>
+
+    <!-- Short labels for the mode chips -->
+    <string name="chip_focus">Focus</string>
+    <string name="chip_short">Short</string>
+    <string name="chip_long">Long</string>
+
     <string name="action_start">Start</string>
     <string name="action_pause">Pause</string>
     <string name="action_reset">Reset</string>

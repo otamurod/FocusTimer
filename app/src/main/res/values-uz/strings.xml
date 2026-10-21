@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">Fokus taymer</string>
+
+    <!-- Screen title for each session mode -->
     <string name="title_focus">Fokus</string>
+    <string name="title_short_break">Qisqa tanaffus</string>
+    <string name="title_long_break">Uzun tanaffus</string>
+
+    <!-- Short labels for the mode chips -->
+    <string name="chip_focus">Fokus</string>
+    <string name="chip_short">Qisqa</string>
+    <string name="chip_long">Uzun</string>
+
     <string name="action_start">Boshlash</string>
     <string name="action_pause">Pauza</string>
     <string name="action_reset">Qayta boshlash</string>

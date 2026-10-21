@@ -10,7 +10,8 @@ given article describes.
 | --- | --- | --- |
 | `article-01` | Kotlin you will use daily on Android | Data classes, null safety, lambdas, coroutines and a first working countdown |
 | `article-02` | Anatomy of an Android project | Package `uz.otamurod.focustimer`, `Application` class, lifecycle logging, string resources with an Uzbek translation, debug/release build types |
-| `article-03` | Compose basics | (coming) |
+| `article-03` | Jetpack Compose basics | Mode chips (hoisted state), smaller composables, a Compose playground with `remember` vs `rememberSaveable` |
+| `article-04` | State and ViewModel | (coming) |
 
 ## What is in `article-01` (still here in `article-02`)
 
@@ -46,6 +47,14 @@ pages on 2026-10-16; check them again when you start, because libraries update o
 - `StringsParityTest` - fails the build if a translation misses a key
 - `app/build.gradle.kts` - debug builds get the `.debug` application ID suffix
 
+## What changed in `article-03`
+
+- `model/SessionMode.kt` - `Focus`, `ShortBreak`, `LongBreak`; `Settings.minutesFor(mode)`
+- `TimerUiState.mode` and `TimerViewModel.selectMode()` - one piece of state drives the title and the chips
+- `ui/TimerScreen.kt` - split into `ModeChips`, `TimerDisplay`, `TimerControls`; `TimerContent` stays stateless
+- `ui/playground/ComposeBasics.kt` - `remember` vs `rememberSaveable`, modifier order, recomposition logging
+- Mode strings in `values/` and `values-uz/`; unit tests for `minutesFor`, `selectMode` and `reset`
+
 ## Make it yours
 
 Using this as a template for your own app? Rename the package before publishing anything
@@ -62,6 +71,9 @@ git tag article-01
 # ... later, after applying the Article 2 changes:
 git commit -am "Article 02: project anatomy, lifecycle logging, string resources"
 git tag article-02
+# ... and after the Article 3 changes:
+git commit -am "Article 03: Compose basics, mode chips, playground"
+git tag article-03
 git push --tags
 ```
 
